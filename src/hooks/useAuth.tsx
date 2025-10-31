@@ -50,8 +50,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                  mockUser = { id: 'C1001', name: 'John Doe Customer', role: 'customer', phone: body.identifier };
             } else if (role === 'Fuel Attendant') {
                  mockUser = { id: 'A201', name: 'Jane Smith Attendant', role: 'attendant', station: 'Nairobi West' };
+            } else if (role === 'Station Admin') { // NEW: Handle Station Admin
+                 mockUser = { id: 'ADM301', name: 'Station Admin User', role: 'admin', station: 'Shell Westlands' };
+            } else if (role === 'Super Admin') { // NEW: Handle Super Admin
+                 mockUser = { id: 'SADM001', name: 'Global Super Admin', role: 'super_admin' };
             } else {
-                 mockUser = { id: 'ADM301', name: `${role} User`, role: 'admin' };
+                 // Fallback for unrecognized roles
+                 mockUser = { id: 'U999', name: `${role} Unrecognized`, role: 'customer' }; 
             }
 
             // 1. Mock Login Success
@@ -179,13 +184,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             
             setUser(loggedInUser);
             
-            // Redirect based on role
+            // Redirect based on role (UPDATED LOGIC)
             if (loggedInUser.role === 'customer') {
                 router.push('/dashboard');
             } else if (loggedInUser.role === 'attendant') {
                 router.push('/attendant');
+            } else if (loggedInUser.role === 'admin') { // Station Admin
+                router.push('/admin'); 
+            } else if (loggedInUser.role === 'super_admin') { // Super Admin
+                router.push('/super-admin'); 
             } else {
-                router.push('/admin/dashboard'); 
+                router.push('/dashboard'); 
             }
         } finally {
             setLoading(false);
@@ -216,9 +225,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         // --- VISUALIZATION DEBUG FIX START ---
         // Force a mock customer user if not on the login/register pages.
         // This ensures the dashboard's useEffect gets a user object to start fetching data.
-        if (typeof window !== 'undefined' && window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+        if (typeof window !== 'undefined' && window.location.pathname !== '/login' && window.location.pathname !== '/register' && !window.location.pathname.startsWith('/attendant/login')) {
              console.log('DEBUG: Forcing mock customer login for visualization.');
-             setUser({ id: 'C1001', name: 'Debug User', role: 'customer' });
+             // NOTE: Setting a generic 'admin' role here for the purposes of the visualization
+             // so the next dashboard (Admin) can load correctly after this update.
+             setUser({ id: 'ADM301', name: 'Debug Admin User', role: 'admin' });
         }
         // --- VISUALIZATION DEBUG FIX END ---
         
