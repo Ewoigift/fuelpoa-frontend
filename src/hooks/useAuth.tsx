@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 interface User {
     id: string;
     name: string;
-    role: 'customer' | 'attendant' | 'admin';
+    role: 'customer' | 'attendant' | 'admin' | 'super_admin';
     [key: string]: any; // Allows for additional properties like phone, station, etc.
 }
 
@@ -183,7 +183,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             if (loggedInUser.role === 'customer') {
                 router.push('/dashboard');
             } else if (loggedInUser.role === 'attendant') {
-                router.push('/attendant/transaction');
+                router.push('/attendant');
             } else {
                 router.push('/admin/dashboard'); 
             }
